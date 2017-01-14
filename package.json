@@ -1,0 +1,25 @@
+{
+  "name": "disk-collector",
+  "version": "1.0.0",
+  "description": "Disc collection viewer",
+  "main": "bundle.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lucap/disk-collector.git"
+  },
+  "author": "Luca Pellicoro",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/lucap/disk-collector/issues"
+  },
+  "homepage": "https://github.com/lucap/disk-collector#readme",
+  "devDependencies": {
+    "babel-core": "^6.21.0",
+    "babel-loader": "^6.2.10",
+    "babel-preset-env": "^1.1.8",
+    "webpack": "^1.14.0"
+  }
+}
