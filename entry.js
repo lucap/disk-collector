@@ -5,12 +5,13 @@ import Infinite from 'react-infinite';
 import _ from 'lodash';
 
 const height = 20;
-const DragHandle = SortableHandle(() => <span>::</span>);
+const DragHandle = SortableHandle(() => <span>===</span>);
 
 const SortableItem = SortableElement(({height, value}) => {
     return (
         <li style={{height}}>
             <DragHandle />
+            &nbsp;
             {value}
         </li>
     )
@@ -19,8 +20,8 @@ const SortableItem = SortableElement(({height, value}) => {
 const SortableList = SortableContainer(({items}) => {
   return (
         <Infinite
-      containerHeight={600}
       elementHeight={items.map(({height}) => height)}
+      useWindowAsScrollContainer
     >
       {items.map(({value, height}, index) => <SortableItem key={`item-${index}`} index={index} value={value} height={height}/>)}
     </Infinite>

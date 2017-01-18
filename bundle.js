@@ -77,7 +77,7 @@
 	    return _react2.default.createElement(
 	        'span',
 	        null,
-	        '::'
+	        '==='
 	    );
 	});
 
@@ -89,6 +89,7 @@
 	        'li',
 	        { style: { height: height } },
 	        _react2.default.createElement(DragHandle, null),
+	        '\xA0',
 	        value
 	    );
 	});
@@ -99,11 +100,11 @@
 	    return _react2.default.createElement(
 	        _reactInfinite2.default,
 	        {
-	            containerHeight: 600,
 	            elementHeight: items.map(function (_ref3) {
 	                var height = _ref3.height;
 	                return height;
-	            })
+	            }),
+	            useWindowAsScrollContainer: true
 	        },
 	        items.map(function (_ref4, index) {
 	            var value = _ref4.value,
