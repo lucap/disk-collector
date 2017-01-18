@@ -1,36 +1,51 @@
 import React, {Component} from 'react';
 import {render} from 'react-dom';
 import {SortableContainer, SortableElement, arrayMove} from 'react-sortable-hoc';
+import Infinite from 'react-infinite';
+import _ from 'lodash';
 
-const SortableItem = SortableElement(({value}) => <li>{value}</li>);
+const height = 20;
 
-const SortableList = SortableContainer(({items}) => {
+const SortableItem = SortableElement(({height, value}) => {
     return (
-        <ul>
-            {items.map((value, index) =>
-                <SortableItem key={`item-${index}`} index={index} value={value} />
-            )}
-        </ul>
-    );
+        <li style={{height}}>
+            {value}
+        </li>
+    )
 });
 
+const SortableList = SortableContainer(({items}) => {
+  return (
+        <Infinite
+      containerHeight={600}
+      elementHeight={items.map(({height}) => height)}
+    >
+      {items.map(({value, height}, index) => <SortableItem key={`item-${index}`} index={index} value={value} height={height}/>)}
+    </Infinite>
+  );
+});
+
+
 class SortableComponent extends Component {
-
     state = {
-        items: ['Item 1', 'Item 2', 'Item 3', 'Item 4', 'Item 5', 'Item 6']
+        items: _.times(3300, (index) => {
+            return {value: index, height: height}
+        })
     }
-
     onSortEnd = ({oldIndex, newIndex}) => {
+        let {items} = this.state;
+
         this.setState({
-            items: arrayMove(this.state.items, oldIndex, newIndex)
+            items: arrayMove(items, oldIndex, newIndex)
         });
     };
-
     render() {
+        let {items} = this.state;
+
         return (
-            <SortableList items={this.state.items} onSortEnd={this.onSortEnd} />
+            <SortableList items={items} onSortEnd={this.onSortEnd} />
         )
     }
 }
 
-render(<SortableComponent/>, document.getElementById('root'));
+render(<SortableComponent />, document.getElementById('root'));
