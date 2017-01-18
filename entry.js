@@ -1,14 +1,16 @@
 import React, {Component} from 'react';
 import {render} from 'react-dom';
-import {SortableContainer, SortableElement, arrayMove} from 'react-sortable-hoc';
+import {SortableContainer, SortableElement, arrayMove, SortableHandle} from 'react-sortable-hoc';
 import Infinite from 'react-infinite';
 import _ from 'lodash';
 
 const height = 20;
+const DragHandle = SortableHandle(() => <span>::</span>);
 
 const SortableItem = SortableElement(({height, value}) => {
     return (
         <li style={{height}}>
+            <DragHandle />
             {value}
         </li>
     )
@@ -43,7 +45,7 @@ class SortableComponent extends Component {
         let {items} = this.state;
 
         return (
-            <SortableList items={items} onSortEnd={this.onSortEnd} />
+            <SortableList items={items} onSortEnd={this.onSortEnd} useDragHandle={true}/>
         )
     }
 }
