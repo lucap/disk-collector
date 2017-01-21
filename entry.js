@@ -23,7 +23,13 @@ const SortableList = SortableContainer(({items}) => {
       elementHeight={items.map(({height}) => height)}
       useWindowAsScrollContainer
     >
-      {items.map(({value, height}, index) => <SortableItem key={`item-${index}`} index={index} value={value} height={height}/>)}
+      {items.map(({value, height}, index) =>
+        <SortableItem
+            key={`item-${index}`}
+            index={index}
+            value={value}
+            height={height}
+        />)}
     </Infinite>
   );
 });
@@ -46,7 +52,12 @@ class SortableComponent extends Component {
         let {items} = this.state;
 
         return (
-            <SortableList items={items} onSortEnd={this.onSortEnd} useDragHandle={true}/>
+            <SortableList
+                items={items}
+                onSortEnd={this.onSortEnd}
+                useDragHandle={true}
+
+            />
         )
     }
 }
