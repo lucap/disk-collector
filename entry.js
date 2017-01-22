@@ -10,13 +10,12 @@ const DragHandle = SortableHandle(() => <span>===</span>);
 const SortableItem = SortableElement(({height, value}) => {
     return (
         <li style={{height}}>
+            {value.basic_information.title}
             {
                 value === false
                 ? null
                 : (<DragHandle />)
             }
-            &nbsp;
-            {value.basic_information.title}
         </li>
     )
 });
