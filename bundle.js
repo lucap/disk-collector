@@ -72,7 +72,7 @@
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-	var height = 20;
+	var ELEMENT_HEIGHT = 40;
 	var DragHandle = (0, _reactSortableHoc.SortableHandle)(function () {
 	    return _react2.default.createElement(
 	        'span',
@@ -88,9 +88,8 @@
 	    return _react2.default.createElement(
 	        'li',
 	        { style: { height: height } },
-	        _react2.default.createElement(DragHandle, null),
-	        '\xA0',
-	        value
+	        value.basic_information.title,
+	        value === false ? null : _react2.default.createElement(DragHandle, null)
 	    );
 	});
 
@@ -100,48 +99,35 @@
 	    return _react2.default.createElement(
 	        _reactInfinite2.default,
 	        {
-	            elementHeight: items.map(function (_ref3) {
-	                var height = _ref3.height;
-	                return height;
-	            }),
-	            useWindowAsScrollContainer: true
-	        },
-	        items.map(function (_ref4, index) {
-	            var value = _ref4.value,
-	                height = _ref4.height;
-	            return _react2.default.createElement(SortableItem, { key: 'item-' + index, index: index, value: value, height: height });
+	            elementHeight: ELEMENT_HEIGHT,
+	            useWindowAsScrollContainer: true },
+	        items.map(function (_ref3, index) {
+	            var value = _ref3.value,
+	                height = _ref3.height;
+	            return _react2.default.createElement(SortableItem, {
+	                key: 'item-' + index,
+	                index: index,
+	                value: value,
+	                height: height
+	            });
 	        })
 	    );
 	});
 
-	var SortableComponent = function (_Component) {
-	    _inherits(SortableComponent, _Component);
+	var App = function (_Component) {
+	    _inherits(App, _Component);
 
-	    function SortableComponent() {
-	        var _ref5;
+	    function App(props) {
+	        _classCallCheck(this, App);
 
-	        var _temp, _this, _ret;
+	        var _this = _possibleConstructorReturn(this, (App.__proto__ || Object.getPrototypeOf(App)).call(this, props));
 
-	        _classCallCheck(this, SortableComponent);
-
-	        for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
-	            args[_key] = arguments[_key];
-	        }
-
-	        return _ret = (_temp = (_this = _possibleConstructorReturn(this, (_ref5 = SortableComponent.__proto__ || Object.getPrototypeOf(SortableComponent)).call.apply(_ref5, [this].concat(args))), _this), Object.defineProperty(_this, 'state', {
+	        Object.defineProperty(_this, 'onSortEnd', {
 	            enumerable: true,
 	            writable: true,
-	            value: {
-	                items: _lodash2.default.times(3300, function (index) {
-	                    return { value: index, height: height };
-	                })
-	            }
-	        }), Object.defineProperty(_this, 'onSortEnd', {
-	            enumerable: true,
-	            writable: true,
-	            value: function value(_ref6) {
-	                var oldIndex = _ref6.oldIndex,
-	                    newIndex = _ref6.newIndex;
+	            value: function value(_ref4) {
+	                var oldIndex = _ref4.oldIndex,
+	                    newIndex = _ref4.newIndex;
 	                var items = _this.state.items;
 
 
@@ -149,23 +135,56 @@
 	                    items: (0, _reactSortableHoc.arrayMove)(items, oldIndex, newIndex)
 	                });
 	            }
-	        }), _temp), _possibleConstructorReturn(_this, _ret);
+	        });
+
+	        console.log(props);
+	        var releases = _this.props.releases;
+
+	        _this.state = {
+	            items: _lodash2.default.map(releases, function (release) {
+	                return { value: release, height: ELEMENT_HEIGHT };
+	            })
+	        };
+
+	        return _this;
 	    }
 
-	    _createClass(SortableComponent, [{
+	    _createClass(App, [{
 	        key: 'render',
 	        value: function render() {
 	            var items = this.state.items;
 
 
-	            return _react2.default.createElement(SortableList, { items: items, onSortEnd: this.onSortEnd, useDragHandle: true });
+	            return _react2.default.createElement(SortableList, {
+	                items: items,
+	                onSortEnd: this.onSortEnd,
+	                useDragHandle: true
+	            });
 	        }
 	    }]);
 
-	    return SortableComponent;
+	    return App;
 	}(_react.Component);
 
-	(0, _reactDom.render)(_react2.default.createElement(SortableComponent, null), document.getElementById('root'));
+	var initializeApp = function initializeApp() {
+	    var releases = [];
+	    fetch('/test_data/page_1.json').then(function (response) {
+	        if (response.status !== 200) {
+	            console.log('Looks like there was a problem. Status Code: ' + response.status);
+	            return;
+	        }
+
+	        response.json().then(function (data) {
+	            console.log(data);
+	            releases = _lodash2.default.concat(releases, data.releases);
+	            (0, _reactDom.render)(_react2.default.createElement(App, { releases: releases }), document.getElementById('root'));
+	        });
+	    }).catch(function (err) {
+	        console.log('Fetch Error :-S', err);
+	    });
+	};
+
+	initializeApp();
 
 /***/ },
 /* 1 */
