@@ -74,20 +74,36 @@ class App extends Component {
     constructor(props) {
         super(props);
         const {releases} = this.props;
+        const items = _.map(releases, (release) => {
+            return {
+                kind: 'release',
+                value: release,
+                height: ELEMENT_HEIGHT
+            }
+        })
+
+        const unShelfHeader = {
+            kind: 'shelf',
+            value: {
+                editable: false,
+                title: 'Unshelved Releases',
+            },
+            height: ELEMENT_HEIGHT
+        };
+
         this.state = {
-            items: _.map(releases, (release) => {
-                return {
-                    kind: 'release',
-                    value: release,
-                    height: ELEMENT_HEIGHT
-                }
-            })
+            items: insert(items, unShelfHeader, 0)
         }
     }
 
     onSortEnd = ({oldIndex, newIndex}) => {
-        let {items} = this.state;
 
+        if (newIndex === 0) {
+            // don't allow any release to be above the top shelf
+            return;
+        }
+
+        let {items} = this.state;
         this.setState({
             items: arrayMove(items, oldIndex, newIndex)
         });
@@ -95,6 +111,7 @@ class App extends Component {
 
     onNewShelf = () => {
         let {items} = this.state;
+
         const newShelf = {
             kind: 'shelf',
             value: {
@@ -103,6 +120,7 @@ class App extends Component {
             },
             height: ELEMENT_HEIGHT
         };
+
         this.setState({
             items: insert(items, newShelf, 0)
         });
