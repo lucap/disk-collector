@@ -11,12 +11,12 @@ const SortableItem = SortableElement(({height, value}) => {
     return (
         <li style={{height}}>
             {
-                value % 10 === 0
+                value === false
                 ? null
                 : (<DragHandle />)
             }
             &nbsp;
-            {value}
+            {value.basic_information.title}
         </li>
     )
 });
@@ -40,18 +40,27 @@ const SortableList = SortableContainer(({items}) => {
 
 
 class App extends Component {
-    state = {
-        items: _.times(3300, (index) => {
-            return {value: index, height: ELEMENT_HEIGHT}
-        })
+
+    constructor(props) {
+        super(props);
+        console.log(props);
+        const {releases} = this.props;
+        this.state = {
+            items: _.map(releases, (release) => {
+                return {value: release, height: ELEMENT_HEIGHT}
+            })
+        }
+
     }
+
     onSortEnd = ({oldIndex, newIndex}) => {
         let {items} = this.state;
 
         this.setState({
             items: arrayMove(items, oldIndex, newIndex)
         });
-    };
+    }
+
     render() {
         let {items} = this.state;
 
@@ -62,7 +71,30 @@ class App extends Component {
                 useDragHandle={true}
             />
         )
-    }
+    };
 }
 
-render(<App/>, document.getElementById('root'));
+const initializeApp = () => {
+    let releases = [];
+    fetch('/test_data/page_1.json')
+        .then((response) => {
+            if (response.status !== 200) {
+                console.log('Looks like there was a problem. Status Code: ' +  response.status);
+                return;
+            }
+
+            response.json().then((data) => {
+                console.log(data);
+                releases = _.concat(releases, data.releases);
+                render(
+                    <App releases={releases}/>,
+                    document.getElementById('root')
+                );
+            })
+        })
+        .catch((err) => {
+            console.log('Fetch Error :-S', err);
+        })
+}
+
+initializeApp();
