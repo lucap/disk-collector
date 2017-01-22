@@ -40,7 +40,7 @@ class Release extends Component {
 
 const SortableItem = SortableElement(({height, value, kind}) => {
     return (
-        <li style={{height}}>
+        <li style={{height}} className={kind === 'release' ? 'release' : 'shelf_header'}>
             {
                 kind === 'release'
                 ? (<Release info={value}/>)
@@ -99,7 +99,7 @@ class App extends Component {
             kind: 'shelf',
             value: {
                 editable: true,
-                title: 'untitled new shelf',
+                title: 'untitled shelf',
             },
             height: ELEMENT_HEIGHT
         };
