@@ -100,7 +100,7 @@ class App extends Component {
 
         if (newIndex === 0) {
             // don't allow any release to be above the top shelf
-            return;
+            newIndex = 1;
         }
 
         let {items} = this.state;
