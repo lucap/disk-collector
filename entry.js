@@ -5,8 +5,9 @@ import Infinite from 'react-infinite';
 import _ from 'lodash';
 import 'whatwg-fetch';
 
-const ELEMENT_HEIGHT = 40;
-const DragHandle = SortableHandle(() => <span>===</span>);
+const ELEMENT_HEIGHT = 100;
+
+const DragHandle = SortableHandle(() => <span className={'handle'}>&#8801;</span>);
 
 const SortableItem = SortableElement(({height, value}) => {
     return (

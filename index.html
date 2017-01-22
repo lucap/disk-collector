@@ -8,12 +8,15 @@
                 margin: 0;
                 overflow-y: scroll;
                 -webkit-overflow-scrolling: touch;
-
                 font-family: Helvetica, Arial, sans-serif;
                 font-size: 14px;
-
                 background: #eee;
+            }
 
+            #root {
+                margin: auto;
+                width: 50%;
+                min-width: 350px;
             }
 
             li {
@@ -29,10 +32,15 @@
                 line-height: 3;
                 vertical-align: middle;
             }
+
+            .handle {
+                float: right;
+                font-size: 30px;
+            }
         </style>
     </head>
     <body>
-    	<div id="root"></div>
+        <div id="root"></div>
         <script type="text/javascript" src="bundle.js" charset="utf-8"></script>
     </body>
 </html>
