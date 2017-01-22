@@ -41,10 +41,8 @@ const SortableList = SortableContainer(({items}) => {
 
 
 class App extends Component {
-
     constructor(props) {
         super(props);
-        console.log(props);
         const {releases} = this.props;
         this.state = {
             items: _.map(releases, (release) => {
@@ -62,15 +60,27 @@ class App extends Component {
         });
     }
 
+    onNewShelf = () => {
+        console.log('new shelf');
+    }
+
     render() {
         let {items} = this.state;
 
         return (
-            <SortableList
-                items={items}
-                onSortEnd={this.onSortEnd}
-                useDragHandle={true}
-            />
+            <div>
+                <div className={'new_shelf_container'}>
+                    <div className={'new_shelf'}
+                         onClick={this.onNewShelf}>
+                        Add New Shelf
+                    </div>
+                </div>
+                <SortableList
+                    items={items}
+                    onSortEnd={this.onSortEnd}
+                    useDragHandle={true}
+                />
+            </div>
         )
     };
 }
@@ -85,7 +95,6 @@ const initializeApp = () => {
             }
 
             response.json().then((data) => {
-                console.log(data);
                 releases = _.concat(releases, data.releases);
                 render(
                     <App releases={releases}/>,
