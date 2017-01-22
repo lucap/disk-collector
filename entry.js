@@ -4,13 +4,18 @@ import {SortableContainer, SortableElement, arrayMove, SortableHandle} from 'rea
 import Infinite from 'react-infinite';
 import _ from 'lodash';
 
-const height = 20;
+const ELEMENT_HEIGHT = 40;
 const DragHandle = SortableHandle(() => <span>===</span>);
 
 const SortableItem = SortableElement(({height, value}) => {
+    console.log(value % 10 === 0);
     return (
         <li style={{height}}>
-            <DragHandle />
+            {
+                value % 10 === 0
+                ? null
+                : (<DragHandle />)
+            }
             &nbsp;
             {value}
         </li>
@@ -18,27 +23,27 @@ const SortableItem = SortableElement(({height, value}) => {
 });
 
 const SortableList = SortableContainer(({items}) => {
-  return (
+    return (
         <Infinite
-      elementHeight={items.map(({height}) => height)}
-      useWindowAsScrollContainer
-    >
-      {items.map(({value, height}, index) =>
-        <SortableItem
-            key={`item-${index}`}
-            index={index}
-            value={value}
-            height={height}
-        />)}
-    </Infinite>
-  );
+            elementHeight={ELEMENT_HEIGHT}
+            useWindowAsScrollContainer>
+                {items.map(({value, height}, index) =>
+                    <SortableItem
+                        key={`item-${index}`}
+                        index={index}
+                        value={value}
+                        height={height}
+                    />
+                )}
+        </Infinite>
+    );
 });
 
 
 class SortableComponent extends Component {
     state = {
         items: _.times(3300, (index) => {
-            return {value: index, height: height}
+            return {value: index, height: ELEMENT_HEIGHT}
         })
     }
     onSortEnd = ({oldIndex, newIndex}) => {
