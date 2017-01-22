@@ -8,7 +8,6 @@ const ELEMENT_HEIGHT = 40;
 const DragHandle = SortableHandle(() => <span>===</span>);
 
 const SortableItem = SortableElement(({height, value}) => {
-    console.log(value % 10 === 0);
     return (
         <li style={{height}}>
             {
@@ -40,7 +39,7 @@ const SortableList = SortableContainer(({items}) => {
 });
 
 
-class SortableComponent extends Component {
+class App extends Component {
     state = {
         items: _.times(3300, (index) => {
             return {value: index, height: ELEMENT_HEIGHT}
@@ -61,10 +60,9 @@ class SortableComponent extends Component {
                 items={items}
                 onSortEnd={this.onSortEnd}
                 useDragHandle={true}
-
             />
         )
     }
 }
 
-render(<SortableComponent />, document.getElementById('root'));
+render(<App/>, document.getElementById('root'));
