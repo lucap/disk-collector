@@ -3,6 +3,7 @@ import {render} from 'react-dom';
 import {SortableContainer, SortableElement, arrayMove, SortableHandle} from 'react-sortable-hoc';
 import Infinite from 'react-infinite';
 import _ from 'lodash';
+import 'whatwg-fetch';
 
 const ELEMENT_HEIGHT = 40;
 const DragHandle = SortableHandle(() => <span>===</span>);
