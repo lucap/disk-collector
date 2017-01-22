@@ -7,16 +7,45 @@ import 'whatwg-fetch';
 
 const ELEMENT_HEIGHT = 100;
 
+const insert = (arr, item, index) => {
+    let _arr = _.cloneDeep(arr);
+    _arr.splice(index, 0, item);
+    return _arr;
+}
+
+
 const DragHandle = SortableHandle(() => <span className={'handle'}>&#8801;</span>);
 
-const SortableItem = SortableElement(({height, value}) => {
+class ShelfHeader extends Component {
+    render() {
+        const {info} = this.props;
+        return (
+            <div>{info.title}</div>
+        );
+    };
+}
+
+class Release extends Component {
+    render() {
+        const {info} = this.props;
+        return (
+            <div>
+                <span>{info.basic_information.title}</span>
+                <DragHandle/>
+            </div>
+        );
+    };
+}
+
+
+const SortableItem = SortableElement(({height, value, kind}) => {
     return (
         <li style={{height}}>
-            {value.basic_information.title}
             {
-                value === false
-                ? null
-                : (<DragHandle />)
+                kind === 'release'
+                ? (<Release info={value}/>)
+                : (<ShelfHeader info={value}/>)
+
             }
         </li>
     )
@@ -27,10 +56,11 @@ const SortableList = SortableContainer(({items}) => {
         <Infinite
             elementHeight={ELEMENT_HEIGHT}
             useWindowAsScrollContainer>
-                {items.map(({value, height}, index) =>
+                {items.map(({value, height, kind}, index) =>
                     <SortableItem
                         key={`item-${index}`}
                         index={index}
+                        kind={kind}
                         value={value}
                         height={height}
                     />
@@ -46,10 +76,13 @@ class App extends Component {
         const {releases} = this.props;
         this.state = {
             items: _.map(releases, (release) => {
-                return {value: release, height: ELEMENT_HEIGHT}
+                return {
+                    kind: 'release',
+                    value: release,
+                    height: ELEMENT_HEIGHT
+                }
             })
         }
-
     }
 
     onSortEnd = ({oldIndex, newIndex}) => {
@@ -61,7 +94,19 @@ class App extends Component {
     }
 
     onNewShelf = () => {
-        console.log('new shelf');
+        let {items} = this.state;
+        const newShelf = {
+            kind: 'shelf',
+            value: {
+                editable: true,
+                title: 'untitled new shelf',
+            },
+            height: ELEMENT_HEIGHT
+        };
+        this.setState({
+            items: insert(items, newShelf, 0)
+        });
+
     }
 
     render() {
