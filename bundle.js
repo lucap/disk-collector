@@ -76,6 +76,12 @@
 
 	var ELEMENT_HEIGHT = 100;
 
+	var insert = function insert(arr, item, index) {
+	    var _arr = _lodash2.default.cloneDeep(arr);
+	    _arr.splice(index, 0, item);
+	    return _arr;
+	};
+
 	var DragHandle = (0, _reactSortableHoc.SortableHandle)(function () {
 	    return _react2.default.createElement(
 	        'span',
@@ -84,15 +90,70 @@
 	    );
 	});
 
+	var ShelfHeader = function (_Component) {
+	    _inherits(ShelfHeader, _Component);
+
+	    function ShelfHeader() {
+	        _classCallCheck(this, ShelfHeader);
+
+	        return _possibleConstructorReturn(this, (ShelfHeader.__proto__ || Object.getPrototypeOf(ShelfHeader)).apply(this, arguments));
+	    }
+
+	    _createClass(ShelfHeader, [{
+	        key: 'render',
+	        value: function render() {
+	            var info = this.props.info;
+
+	            return _react2.default.createElement(
+	                'div',
+	                null,
+	                info.title
+	            );
+	        }
+	    }]);
+
+	    return ShelfHeader;
+	}(_react.Component);
+
+	var Release = function (_Component2) {
+	    _inherits(Release, _Component2);
+
+	    function Release() {
+	        _classCallCheck(this, Release);
+
+	        return _possibleConstructorReturn(this, (Release.__proto__ || Object.getPrototypeOf(Release)).apply(this, arguments));
+	    }
+
+	    _createClass(Release, [{
+	        key: 'render',
+	        value: function render() {
+	            var info = this.props.info;
+
+	            return _react2.default.createElement(
+	                'div',
+	                null,
+	                _react2.default.createElement(
+	                    'span',
+	                    null,
+	                    info.basic_information.title
+	                ),
+	                _react2.default.createElement(DragHandle, null)
+	            );
+	        }
+	    }]);
+
+	    return Release;
+	}(_react.Component);
+
 	var SortableItem = (0, _reactSortableHoc.SortableElement)(function (_ref) {
 	    var height = _ref.height,
-	        value = _ref.value;
+	        value = _ref.value,
+	        kind = _ref.kind;
 
 	    return _react2.default.createElement(
 	        'li',
-	        { style: { height: height } },
-	        value.basic_information.title,
-	        value === false ? null : _react2.default.createElement(DragHandle, null)
+	        { style: { height: height }, className: kind === 'release' ? 'release' : 'shelf_header' },
+	        kind === 'release' ? _react2.default.createElement(Release, { info: value }) : _react2.default.createElement(ShelfHeader, { info: value })
 	    );
 	});
 
@@ -106,10 +167,12 @@
 	            useWindowAsScrollContainer: true },
 	        items.map(function (_ref3, index) {
 	            var value = _ref3.value,
-	                height = _ref3.height;
+	                height = _ref3.height,
+	                kind = _ref3.kind;
 	            return _react2.default.createElement(SortableItem, {
 	                key: 'item-' + index,
 	                index: index,
+	                kind: kind,
 	                value: value,
 	                height: height
 	            });
@@ -117,39 +180,39 @@
 	    );
 	});
 
-	var App = function (_Component) {
-	    _inherits(App, _Component);
+	var App = function (_Component3) {
+	    _inherits(App, _Component3);
 
 	    function App(props) {
 	        _classCallCheck(this, App);
 
-	        var _this = _possibleConstructorReturn(this, (App.__proto__ || Object.getPrototypeOf(App)).call(this, props));
+	        var _this3 = _possibleConstructorReturn(this, (App.__proto__ || Object.getPrototypeOf(App)).call(this, props));
 
-	        Object.defineProperty(_this, 'onSortEnd', {
-	            enumerable: true,
-	            writable: true,
-	            value: function value(_ref4) {
-	                var oldIndex = _ref4.oldIndex,
-	                    newIndex = _ref4.newIndex;
-	                var items = _this.state.items;
+	        _initialiseProps.call(_this3);
 
+	        var releases = _this3.props.releases;
 
-	                _this.setState({
-	                    items: (0, _reactSortableHoc.arrayMove)(items, oldIndex, newIndex)
-	                });
-	            }
+	        var items = _lodash2.default.map(releases, function (release) {
+	            return {
+	                kind: 'release',
+	                value: release,
+	                height: ELEMENT_HEIGHT
+	            };
 	        });
 
-	        console.log(props);
-	        var releases = _this.props.releases;
-
-	        _this.state = {
-	            items: _lodash2.default.map(releases, function (release) {
-	                return { value: release, height: ELEMENT_HEIGHT };
-	            })
+	        var unShelfHeader = {
+	            kind: 'shelf',
+	            value: {
+	                editable: false,
+	                title: 'Unshelved Releases'
+	            },
+	            height: ELEMENT_HEIGHT
 	        };
 
-	        return _this;
+	        _this3.state = {
+	            items: insert(items, unShelfHeader, 0)
+	        };
+	        return _this3;
 	    }
 
 	    _createClass(App, [{
@@ -158,16 +221,76 @@
 	            var items = this.state.items;
 
 
-	            return _react2.default.createElement(SortableList, {
-	                items: items,
-	                onSortEnd: this.onSortEnd,
-	                useDragHandle: true
-	            });
+	            return _react2.default.createElement(
+	                'div',
+	                null,
+	                _react2.default.createElement(
+	                    'div',
+	                    { className: 'new_shelf_container' },
+	                    _react2.default.createElement(
+	                        'div',
+	                        { className: 'new_shelf',
+	                            onClick: this.onNewShelf },
+	                        'Add New Shelf'
+	                    )
+	                ),
+	                _react2.default.createElement(SortableList, {
+	                    items: items,
+	                    onSortEnd: this.onSortEnd,
+	                    useDragHandle: true
+	                })
+	            );
 	        }
 	    }]);
 
 	    return App;
 	}(_react.Component);
+
+	var _initialiseProps = function _initialiseProps() {
+	    var _this4 = this;
+
+	    Object.defineProperty(this, 'onSortEnd', {
+	        enumerable: true,
+	        writable: true,
+	        value: function value(_ref4) {
+	            var oldIndex = _ref4.oldIndex,
+	                newIndex = _ref4.newIndex;
+
+
+	            if (newIndex === 0) {
+	                // don't allow any release to be above the top shelf
+	                newIndex = 1;
+	            }
+
+	            var items = _this4.state.items;
+
+	            _this4.setState({
+	                items: (0, _reactSortableHoc.arrayMove)(items, oldIndex, newIndex)
+	            });
+	        }
+	    });
+	    Object.defineProperty(this, 'onNewShelf', {
+	        enumerable: true,
+	        writable: true,
+	        value: function value() {
+	            var items = _this4.state.items;
+
+
+	            var newShelf = {
+	                kind: 'shelf',
+	                value: {
+	                    editable: true,
+	                    title: 'untitled shelf'
+	                },
+	                height: ELEMENT_HEIGHT
+	            };
+
+	            _this4.setState({
+	                items: insert(items, newShelf, 0)
+	            });
+	        }
+	    });
+	};
 
 	var initializeApp = function initializeApp() {
 	    var releases = [];
@@ -178,7 +301,6 @@
 	        }
 
 	        response.json().then(function (data) {
-	            console.log(data);
 	            releases = _lodash2.default.concat(releases, data.releases);
 	            (0, _reactDom.render)(_react2.default.createElement(App, { releases: releases }), document.getElementById('root'));
 	        });
