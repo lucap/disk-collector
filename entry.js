@@ -272,6 +272,11 @@ const fetchInitialData = (records, nextUrl, callback) => {
             response.json().then((data) => {
                 records = _.concat(records, data.releases);
                 nextUrl = data.pagination.urls.next;
+
+                // if (data.pagination.page === 3) {
+                //     nextUrl = null;
+                // }
+
                 if (nextUrl) {
                     setTimeout(() => {
                         fetchInitialData(records, nextUrl, callback);
