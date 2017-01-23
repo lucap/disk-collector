@@ -68,7 +68,13 @@
 
 	var _riek = __webpack_require__(344);
 
+	var _colorHash = __webpack_require__(352);
+
+	var _colorHash2 = _interopRequireDefault(_colorHash);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -77,6 +83,7 @@
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 	var ELEMENT_HEIGHT = 100;
+	var COLOR_HASH = new _colorHash2.default({ saturation: 1, lightness: 0.7 });
 
 	var insert = function insert(arr, item, index) {
 	    var _arr = _lodash2.default.cloneDeep(arr);
@@ -112,13 +119,13 @@
 	            args[_key] = arguments[_key];
 	        }
 
-	        return _ret = (_temp = (_this = _possibleConstructorReturn(this, (_ref = ShelfHeader.__proto__ || Object.getPrototypeOf(ShelfHeader)).call.apply(_ref, [this].concat(args))), _this), Object.defineProperty(_this, 'onEdit', {
+	        return _ret = (_temp = (_this = _possibleConstructorReturn(this, (_ref = ShelfHeader.__proto__ || Object.getPrototypeOf(ShelfHeader)).call.apply(_ref, [this].concat(args))), _this), Object.defineProperty(_this, 'handleOnEdit', {
 	            enumerable: true,
 	            writable: true,
 	            value: function value(_ref2) {
 	                var title = _ref2.title;
 
-	                console.log(title);
+	                _this.props.onEdit(title);
 	            }
 	        }), _temp), _possibleConstructorReturn(_this, _ret);
 	    }
@@ -126,20 +133,33 @@
 	    _createClass(ShelfHeader, [{
 	        key: 'render',
 	        value: function render() {
-	            var _props$info = this.props.info,
+	            var _props = this.props,
+	                _props$info = _props.info,
 	                title = _props$info.title,
-	                editable = _props$info.editable;
+	                editable = _props$info.editable,
+	                onRemove = _props.onRemove;
 
 
 	            return _react2.default.createElement(
 	                'div',
 	                { className: 'shelf_title_container' },
-	                editable === true ? _react2.default.createElement(_riek.RIEInput, {
-	                    value: 'untitled shelf',
-	                    change: this.onEdit,
-	                    propName: 'title',
-	                    className: 'shelf_title'
-	                }) : _react2.default.createElement(
+	                editable ? _react2.default.createElement(
+	                    'div',
+	                    null,
+	                    _react2.default.createElement(_riek.RIEInput, {
+	                        value: title,
+	                        change: this.handleOnEdit,
+	                        propName: 'title',
+	                        className: 'shelf_title'
+	                    }),
+	                    _react2.default.createElement(
+	                        'span',
+	                        {
+	                            className: 'shelf_remove',
+	                            onClick: onRemove },
+	                        '\u2715'
+	                    )
+	                ) : _react2.default.createElement(
 	                    'div',
 	                    { className: 'shelf_title' },
 	                    title
@@ -171,9 +191,13 @@
 	                year = _props$info$basic_inf.year;
 
 
+	            var style = {
+	                backgroundColor: 'rgba(' + _lodash2.default.join([].concat(_toConsumableArray(COLOR_HASH.rgb(title)), [.6]), ',') + ')'
+	            };
+
 	            return _react2.default.createElement(
 	                'div',
-	                { className: 'record_info' },
+	                { className: 'record_info', style: style },
 	                _react2.default.createElement(
 	                    'div',
 	                    null,
@@ -201,36 +225,46 @@
 	    return Record;
 	}(_react.Component);
 
-	var SortableItem = (0, _reactSortableHoc.SortableElement)(function (_ref3) {
-	    var height = _ref3.height,
-	        value = _ref3.value,
-	        kind = _ref3.kind;
+	var SortableItem = (0, _reactSortableHoc.SortableElement)(function (params) {
+	    var height = params.height,
+	        value = params.value,
+	        kind = params.kind,
+	        onEditShelfName = params.onEditShelfName,
+	        onRemoveShelf = params.onRemoveShelf;
 
 	    return _react2.default.createElement(
 	        'li',
 	        { style: { height: height }, className: kind },
-	        kind === 'record' ? _react2.default.createElement(Record, { info: value }) : _react2.default.createElement(ShelfHeader, { info: value })
+	        kind === 'record' ? _react2.default.createElement(Record, { info: value }) : _react2.default.createElement(ShelfHeader, {
+	            info: value,
+	            onEdit: onEditShelfName,
+	            onRemove: onRemoveShelf
+	        })
 	    );
 	});
 
-	var SortableList = (0, _reactSortableHoc.SortableContainer)(function (_ref4) {
-	    var items = _ref4.items;
+	var SortableList = (0, _reactSortableHoc.SortableContainer)(function (params) {
+	    var items = params.items,
+	        onEditShelfName = params.onEditShelfName,
+	        onRemoveShelf = params.onRemoveShelf;
 
 	    return _react2.default.createElement(
 	        _reactInfinite2.default,
 	        {
 	            elementHeight: ELEMENT_HEIGHT,
 	            useWindowAsScrollContainer: true },
-	        items.map(function (_ref5, index) {
-	            var value = _ref5.value,
-	                height = _ref5.height,
-	                kind = _ref5.kind;
+	        items.map(function (_ref3, index) {
+	            var value = _ref3.value,
+	                height = _ref3.height,
+	                kind = _ref3.kind;
 	            return _react2.default.createElement(SortableItem, {
 	                key: 'item-' + index,
 	                index: index,
 	                kind: kind,
 	                value: value,
-	                height: height
+	                height: height,
+	                onEditShelfName: _lodash2.default.partial(onEditShelfName, index),
+	                onRemoveShelf: _lodash2.default.partial(onRemoveShelf, index)
 	            });
 	        })
 	    );
@@ -293,6 +327,8 @@
 	                _react2.default.createElement(SortableList, {
 	                    items: items,
 	                    onSortEnd: this.onSortEnd,
+	                    onEditShelfName: this.onEditShelfName,
+	                    onRemoveShelf: this.onRemoveShelf,
 	                    useDragHandle: true
 	                })
 	            );
@@ -308,10 +344,9 @@
 	    Object.defineProperty(this, 'onSortEnd', {
 	        enumerable: true,
 	        writable: true,
-	        value: function value(_ref6) {
-	            var oldIndex = _ref6.oldIndex,
-	                newIndex = _ref6.newIndex;
-
+	        value: function value(_ref4) {
+	            var oldIndex = _ref4.oldIndex,
+	                newIndex = _ref4.newIndex;
 
 	            if (newIndex === 0) {
 	                // don't allow any records to be above the top shelf
@@ -323,6 +358,46 @@
 	            _this4.setState({
 	                items: (0, _reactSortableHoc.arrayMove)(items, oldIndex, newIndex)
 	            });
+	        }
+	    });
+	    Object.defineProperty(this, 'onEditShelfName', {
+	        enumerable: true,
+	        writable: true,
+	        value: function value(index, new_title) {
+	            var _items = _lodash2.default.cloneDeep(_this4.state.items);
+	            _items[index].value.title = new_title;
+	            _this4.setState({ items: _items });
+	        }
+	    });
+	    Object.defineProperty(this, 'onRemoveShelf', {
+	        enumerable: true,
+	        writable: true,
+	        value: function value(toRemoveIndex) {
+	            var _items = _lodash2.default.cloneDeep(_this4.state.items);
+	            var nextShelfIndex = -1;
+	            var unshelvedIndex = toRemoveIndex + 1;
+
+	            while (true) {
+	                var currentItem = _items[unshelvedIndex];
+	                if (currentItem.kind === 'shelf') {
+	                    if (nextShelfIndex === -1) {
+	                        nextShelfIndex = unshelvedIndex;
+	                    }
+
+	                    if (currentItem.value.editable === false) {
+	                        break;
+	                    }
+	                }
+	                unshelvedIndex += 1;
+	            }
+
+	            var itemsBeforeRemovedShelf = _lodash2.default.slice(_items, 0, toRemoveIndex);
+	            var itemsToReshelve = _lodash2.default.slice(_items, toRemoveIndex + 1, nextShelfIndex);
+	            var itemsAfterRemovedShelf = _lodash2.default.slice(_items, nextShelfIndex, unshelvedIndex + 1);
+	            var unshelvedItems = _lodash2.default.slice(_items, unshelvedIndex + 1);
+
+	            _this4.setState({
+	                items: _lodash2.default.concat(itemsBeforeRemovedShelf, itemsAfterRemovedShelf, itemsToReshelve, unshelvedItems) });
 	        }
 	    });
 	    Object.defineProperty(this, 'onNewShelf', {
@@ -47314,6 +47389,159 @@
 	    options: _react2.default.PropTypes.array.isRequired
 	};
 	exports.default = RIESelect;
+
+/***/ },
+/* 352 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var BKDRHash = __webpack_require__(353);
+
+	/**
+	 * Convert RGB Array to HEX
+	 *
+	 * @param {Array} RGBArray - [R, G, B]
+	 * @returns {String} 6 digits hex starting with #
+	 */
+	var RGB2HEX = function(RGBArray) {
+	    var hex = '#';
+	    RGBArray.forEach(function(value) {
+	        if (value < 16) {
+	            hex += 0;
+	        }
+	        hex += value.toString(16);
+	    });
+	    return hex;
+	};
+
+	/**
+	 * Convert HSL to RGB
+	 *
+	 * @see {@link http://zh.wikipedia.org/wiki/HSL和HSV色彩空间} for further information.
+	 * @param {Number} H Hue ∈ [0, 360)
+	 * @param {Number} S Saturation ∈ [0, 1]
+	 * @param {Number} L Lightness ∈ [0, 1]
+	 * @returns {Array} R, G, B ∈ [0, 255]
+	 */
+	var HSL2RGB = function(H, S, L) {
+	    H /= 360;
+
+	    var q = L < 0.5 ? L * (1 + S) : L + S - L * S;
+	    var p = 2 * L - q;
+
+	    return [H + 1/3, H, H - 1/3].map(function(color) {
+	        if(color < 0) {
+	            color++;
+	        }
+	        if(color > 1) {
+	            color--;
+	        }
+	        if(color < 1/6) {
+	            color = p + (q - p) * 6 * color;
+	        } else if(color < 0.5) {
+	            color = q;
+	        } else if(color < 2/3) {
+	            color = p + (q - p) * 6 * (2/3 - color);
+	        } else {
+	            color = p;
+	        }
+	        return Math.round(color * 255);
+	    });
+	};
+
+	/**
+	 * Color Hash Class
+	 *
+	 * @class
+	 */
+	var ColorHash = function(options) {
+	    options = options || {};
+
+	    var LS = [options.lightness, options.saturation].map(function(param) {
+	        param = param || [0.35, 0.5, 0.65]; // note that 3 is a prime
+	        return Object.prototype.toString.call(param) === '[object Array]' ? param.concat() : [param];
+	    });
+
+	    this.L = LS[0];
+	    this.S = LS[1];
+
+	    this.hash = options.hash || BKDRHash;
+	};
+
+	/**
+	 * Returns the hash in [h, s, l].
+	 * Note that H ∈ [0, 360); S ∈ [0, 1]; L ∈ [0, 1];
+	 *
+	 * @param {String} str string to hash
+	 * @returns {Array} [h, s, l]
+	 */
+	ColorHash.prototype.hsl = function(str) {
+	    var H, S, L;
+	    var hash = this.hash(str);
+
+	    H = hash % 359; // note that 359 is a prime
+	    hash = parseInt(hash / 360);
+	    S = this.S[hash % this.S.length];
+	    hash = parseInt(hash / this.S.length);
+	    L = this.L[hash % this.L.length];
+
+	    return [H, S, L];
+	};
+
+	/**
+	 * Returns the hash in [r, g, b].
+	 * Note that R, G, B ∈ [0, 255]
+	 *
+	 * @param {String} str string to hash
+	 * @returns {Array} [r, g, b]
+	 */
+	ColorHash.prototype.rgb = function(str) {
+	    var hsl = this.hsl(str);
+	    return HSL2RGB.apply(this, hsl);
+	};
+
+	/**
+	 * Returns the hash in hex
+	 *
+	 * @param {String} str string to hash
+	 * @returns {String} hex with #
+	 */
+	ColorHash.prototype.hex = function(str) {
+	    var rgb = this.rgb(str);
+	    return RGB2HEX(rgb);
+	};
+
+	module.exports = ColorHash;
+
+
+/***/ },
+/* 353 */
+/***/ function(module, exports) {
+
+	/**
+	 * BKDR Hash (modified version)
+	 *
+	 * @param {String} str string to hash
+	 * @returns {Number}
+	 */
+	var BKDRHash = function(str) {
+	    var seed = 131;
+	    var seed2 = 137;
+	    var hash = 0;
+	    // make hash more sensitive for short string like 'a', 'b', 'c'
+	    str += 'x';
+	    // Note: Number.MAX_SAFE_INTEGER equals 9007199254740991
+	    var MAX_SAFE_INTEGER = parseInt(9007199254740991 / seed2);
+	    for(var i = 0; i < str.length; i++) {
+	        if(hash > MAX_SAFE_INTEGER) {
+	            hash = parseInt(hash / seed2);
+	        }
+	        hash = hash * seed + str.charCodeAt(i);
+	    }
+	    return hash;
+	};
+
+	module.exports = BKDRHash;
+
 
 /***/ }
 /******/ ]);

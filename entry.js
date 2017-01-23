@@ -261,9 +261,8 @@ class App extends Component {
     };
 }
 
-const initializeApp = () => {
-    let records = [];
-    fetch('/test_data/page_1.json')
+const fetchInitialData = (records, nextUrl, callback) => {
+    fetch(nextUrl)
         .then((response) => {
             if (response.status !== 200) {
                 console.log('Looks like there was a problem. Status Code: ' +  response.status);
@@ -272,10 +271,15 @@ const initializeApp = () => {
 
             response.json().then((data) => {
                 records = _.concat(records, data.releases);
-                render(
-                    <App records={records}/>,
-                    document.getElementById('root')
-                );
+                nextUrl = data.pagination.urls.next;
+                if (nextUrl) {
+                    setTimeout(() => {
+                        fetchInitialData(records, nextUrl, callback);
+                    }, 5000);
+                } else {
+                    callback(records);
+                }
+
             })
         })
         .catch((err) => {
@@ -283,4 +287,11 @@ const initializeApp = () => {
         })
 }
 
-initializeApp();
+let records = [];
+let nextUrl = 'https://api.discogs.com/users/blacklight/collection/folders/0/releases?per_page=100'
+fetchInitialData(records, nextUrl, (records) => {
+    render(
+        <App records={records}/>,
+        document.getElementById('root')
+    );
+});
