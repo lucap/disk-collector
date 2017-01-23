@@ -82,6 +82,12 @@
 	    return _arr;
 	};
 
+	var joinNames = function joinNames(info) {
+	    return _lodash2.default.join(_lodash2.default.map(info, function (item) {
+	        return item.name;
+	    }), ', ');
+	};
+
 	var DragHandle = (0, _reactSortableHoc.SortableHandle)(function () {
 	    return _react2.default.createElement(
 	        'span',
@@ -115,34 +121,54 @@
 	    return ShelfHeader;
 	}(_react.Component);
 
-	var Release = function (_Component2) {
-	    _inherits(Release, _Component2);
+	var Record = function (_Component2) {
+	    _inherits(Record, _Component2);
 
-	    function Release() {
-	        _classCallCheck(this, Release);
+	    function Record() {
+	        _classCallCheck(this, Record);
 
-	        return _possibleConstructorReturn(this, (Release.__proto__ || Object.getPrototypeOf(Release)).apply(this, arguments));
+	        return _possibleConstructorReturn(this, (Record.__proto__ || Object.getPrototypeOf(Record)).apply(this, arguments));
 	    }
 
-	    _createClass(Release, [{
+	    _createClass(Record, [{
 	        key: 'render',
 	        value: function render() {
-	            var info = this.props.info;
+	            var _props$info$basic_inf = this.props.info.basic_information,
+	                title = _props$info$basic_inf.title,
+	                artists = _props$info$basic_inf.artists,
+	                formats = _props$info$basic_inf.formats,
+	                labels = _props$info$basic_inf.labels,
+	                year = _props$info$basic_inf.year;
+
 
 	            return _react2.default.createElement(
 	                'div',
-	                null,
+	                { className: 'record_info' },
 	                _react2.default.createElement(
-	                    'span',
+	                    'div',
 	                    null,
-	                    info.basic_information.title
+	                    title
+	                ),
+	                _react2.default.createElement(
+	                    'div',
+	                    null,
+	                    joinNames(artists)
+	                ),
+	                _react2.default.createElement(
+	                    'div',
+	                    null,
+	                    joinNames(labels),
+	                    '\xA0\u2014\xA0',
+	                    joinNames(formats),
+	                    '\xA0\u2014\xA0',
+	                    year
 	                ),
 	                _react2.default.createElement(DragHandle, null)
 	            );
 	        }
 	    }]);
 
-	    return Release;
+	    return Record;
 	}(_react.Component);
 
 	var SortableItem = (0, _reactSortableHoc.SortableElement)(function (_ref) {
@@ -152,8 +178,8 @@
 
 	    return _react2.default.createElement(
 	        'li',
-	        { style: { height: height }, className: kind === 'release' ? 'release' : 'shelf_header' },
-	        kind === 'release' ? _react2.default.createElement(Release, { info: value }) : _react2.default.createElement(ShelfHeader, { info: value })
+	        { style: { height: height }, className: kind },
+	        kind === 'record' ? _react2.default.createElement(Record, { info: value }) : _react2.default.createElement(ShelfHeader, { info: value })
 	    );
 	});
 
@@ -190,12 +216,12 @@
 
 	        _initialiseProps.call(_this3);
 
-	        var releases = _this3.props.releases;
+	        var records = _this3.props.records;
 
-	        var items = _lodash2.default.map(releases, function (release) {
+	        var items = _lodash2.default.map(records, function (record) {
 	            return {
-	                kind: 'release',
-	                value: release,
+	                kind: 'record',
+	                value: record,
 	                height: ELEMENT_HEIGHT
 	            };
 	        });
@@ -204,7 +230,7 @@
 	            kind: 'shelf',
 	            value: {
 	                editable: false,
-	                title: 'Unshelved Releases'
+	                title: 'Unshelved Records'
 	            },
 	            height: ELEMENT_HEIGHT
 	        };
@@ -258,7 +284,7 @@
 
 
 	            if (newIndex === 0) {
-	                // don't allow any release to be above the top shelf
+	                // don't allow any records to be above the top shelf
 	                newIndex = 1;
 	            }
 
@@ -293,7 +319,7 @@
 	};
 
 	var initializeApp = function initializeApp() {
-	    var releases = [];
+	    var records = [];
 	    fetch('/test_data/page_1.json').then(function (response) {
 	        if (response.status !== 200) {
 	            console.log('Looks like there was a problem. Status Code: ' + response.status);
@@ -301,8 +327,8 @@
 	        }
 
 	        response.json().then(function (data) {
-	            releases = _lodash2.default.concat(releases, data.releases);
-	            (0, _reactDom.render)(_react2.default.createElement(App, { releases: releases }), document.getElementById('root'));
+	            records = _lodash2.default.concat(records, data.releases);
+	            (0, _reactDom.render)(_react2.default.createElement(App, { records: records }), document.getElementById('root'));
 	        });
 	    }).catch(function (err) {
 	        console.log('Fetch Error :-S', err);
