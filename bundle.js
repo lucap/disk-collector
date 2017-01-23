@@ -423,9 +423,8 @@
 	    });
 	};
 
-	var initializeApp = function initializeApp() {
-	    var records = [];
-	    fetch('/test_data/page_1.json').then(function (response) {
+	var fetchInitialData = function fetchInitialData(records, nextUrl, callback) {
+	    fetch(nextUrl).then(function (response) {
 	        if (response.status !== 200) {
 	            console.log('Looks like there was a problem. Status Code: ' + response.status);
 	            return;
@@ -433,14 +432,30 @@
 
 	        response.json().then(function (data) {
 	            records = _lodash2.default.concat(records, data.releases);
-	            (0, _reactDom.render)(_react2.default.createElement(App, { records: records }), document.getElementById('root'));
+	            nextUrl = data.pagination.urls.next;
+
+	            // if (data.pagination.page === 3) {
+	            //     nextUrl = null;
+	            // }
+
+	            if (nextUrl) {
+	                setTimeout(function () {
+	                    fetchInitialData(records, nextUrl, callback);
+	                }, 5000);
+	            } else {
+	                callback(records);
+	            }
 	        });
 	    }).catch(function (err) {
 	        console.log('Fetch Error :-S', err);
 	    });
 	};
 
-	initializeApp();
+	var records = [];
+	var nextUrl = 'https://api.discogs.com/users/blacklight/collection/folders/0/releases?per_page=100';
+	fetchInitialData(records, nextUrl, function (records) {
+	    (0, _reactDom.render)(_react2.default.createElement(App, { records: records }), document.getElementById('root'));
+	});
 
 /***/ },
 /* 1 */
