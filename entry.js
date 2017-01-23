@@ -11,7 +11,9 @@ import _ from 'lodash';
 import 'whatwg-fetch';
 import {RIEInput} from 'riek'
 
+
 const ELEMENT_HEIGHT = 100;
+
 
 const insert = (arr, item, index) => {
     let _arr = _.cloneDeep(arr);
@@ -37,7 +39,8 @@ class ShelfHeader extends Component {
 
     render() {
         const {
-            info: {title, editable}
+            info: {title, editable},
+            onRemove
         } = this.props;
 
         return (
@@ -45,12 +48,19 @@ class ShelfHeader extends Component {
                 {
                     editable
                     ? (
-                        <RIEInput
-                            value={title}
-                            change={this.handleOnEdit}
-                            propName="title"
-                            className='shelf_title'
-                        />
+                        <div>
+                            <RIEInput
+                                value={title}
+                                change={this.handleOnEdit}
+                                propName="title"
+                                className='shelf_title'
+                            />
+                            <span
+                                className='shelf_remove'
+                                onClick={onRemove}>
+                                &#10005;
+                            </span>
+                        </div>
                     )
                     :(<div className='shelf_title'>{title}</div>)
                 }
@@ -85,7 +95,8 @@ class Record extends Component {
 }
 
 
-const SortableItem = SortableElement(({height, value, kind, onEditShelfName}) => {
+const SortableItem = SortableElement((params) => {
+    const {height, value, kind, onEditShelfName, onRemoveShelf} = params;
     return (
         <li style={{height}} className={kind}>
             {
@@ -95,6 +106,7 @@ const SortableItem = SortableElement(({height, value, kind, onEditShelfName}) =>
                     <ShelfHeader
                         info={value}
                         onEdit={onEditShelfName}
+                        onRemove={onRemoveShelf}
                     />
                 )
 
@@ -103,7 +115,8 @@ const SortableItem = SortableElement(({height, value, kind, onEditShelfName}) =>
     )
 });
 
-const SortableList = SortableContainer(({items, onEditShelfName}) => {
+const SortableList = SortableContainer((params) => {
+    const {items, onEditShelfName, onRemoveShelf} = params;
     return (
         <Infinite
             elementHeight={ELEMENT_HEIGHT}
@@ -116,6 +129,7 @@ const SortableList = SortableContainer(({items, onEditShelfName}) => {
                         value={value}
                         height={height}
                         onEditShelfName={_.partial(onEditShelfName, index)}
+                        onRemoveShelf={_.partial(onRemoveShelf, index)}
                     />
                 )}
         </Infinite>
@@ -167,6 +181,39 @@ class App extends Component {
         this.setState({items: _items});
     }
 
+    onRemoveShelf = (toRemoveIndex) => {
+        const _items = _.cloneDeep(this.state.items);
+        let nextShelfIndex = -1;
+        let unshelvedIndex = toRemoveIndex + 1;
+
+        while (true) {
+            const currentItem = _items[unshelvedIndex];
+            if (currentItem.kind === 'shelf') {
+                if (nextShelfIndex === -1) {
+                    nextShelfIndex = unshelvedIndex;
+                }
+
+                if (currentItem.value.editable === false) {
+                    break;
+                }
+            }
+            unshelvedIndex += 1;
+        }
+
+        const itemsBeforeRemovedShelf = _.slice(_items, 0, toRemoveIndex);
+        const itemsToReshelve = _.slice(_items, toRemoveIndex+1, nextShelfIndex);
+        const itemsAfterRemovedShelf = _.slice(_items, nextShelfIndex, unshelvedIndex+1);
+        const unshelvedItems = _.slice(_items, unshelvedIndex+1);
+
+        this.setState({
+            items: _.concat(
+                itemsBeforeRemovedShelf,
+                itemsAfterRemovedShelf,
+                itemsToReshelve,
+                unshelvedItems,
+        )});
+    }
+
     onNewShelf = () => {
         const {items} = this.state;
 
@@ -186,7 +233,7 @@ class App extends Component {
     }
 
     render() {
-        let {items} = this.state;
+        const {items} = this.state;
 
         return (
             <div>
@@ -200,6 +247,7 @@ class App extends Component {
                     items={items}
                     onSortEnd={this.onSortEnd}
                     onEditShelfName={this.onEditShelfName}
+                    onRemoveShelf={this.onRemoveShelf}
                     useDragHandle={true}
                 />
             </div>
