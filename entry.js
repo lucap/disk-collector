@@ -10,9 +10,11 @@ import Infinite from 'react-infinite';
 import _ from 'lodash';
 import 'whatwg-fetch';
 import {RIEInput} from 'riek'
+import ColorHash from 'color-hash'
 
 
 const ELEMENT_HEIGHT = 100;
+const COLOR_HASH = new ColorHash({saturation: 1, lightness: 0.7});
 
 
 const insert = (arr, item, index) => {
@@ -77,8 +79,12 @@ class Record extends Component {
             }
         } = this.props;
 
+        const style = {
+            backgroundColor: `rgba(${_.join([...COLOR_HASH.rgb(title), .6], ',')})`
+        };
+
         return (
-            <div className={'record_info'}>
+            <div className={'record_info'} style={style}>
                 <div>{title}</div>
                 <div>{joinNames(artists)}</div>
                 <div>
