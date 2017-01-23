@@ -1,9 +1,15 @@
 import React, {Component} from 'react';
 import {render} from 'react-dom';
-import {SortableContainer, SortableElement, arrayMove, SortableHandle} from 'react-sortable-hoc';
+import {
+    SortableContainer,
+    SortableElement,
+    arrayMove,
+    SortableHandle
+} from 'react-sortable-hoc';
 import Infinite from 'react-infinite';
 import _ from 'lodash';
 import 'whatwg-fetch';
+import {RIEInput} from 'riek'
 
 const ELEMENT_HEIGHT = 100;
 
@@ -19,13 +25,36 @@ const joinNames = (info) => {
     }), ', ')
 }
 
-const DragHandle = SortableHandle(() => <span className={'handle'}>&#8801;</span>);
+const DragHandle = SortableHandle(
+    () => <span className={'handle'}>&#8801;</span>
+);
 
 class ShelfHeader extends Component {
+
+    handleOnEdit = ({title}) => {
+        this.props.onEdit(title);
+    }
+
     render() {
-        const {info} = this.props;
+        const {
+            info: {title, editable}
+        } = this.props;
+
         return (
-            <div>{info.title}</div>
+            <div className='shelf_title_container'>
+                {
+                    editable
+                    ? (
+                        <RIEInput
+                            value={title}
+                            change={this.handleOnEdit}
+                            propName="title"
+                            className='shelf_title'
+                        />
+                    )
+                    :(<div className='shelf_title'>{title}</div>)
+                }
+            </div>
         );
     };
 }
@@ -56,20 +85,25 @@ class Record extends Component {
 }
 
 
-const SortableItem = SortableElement(({height, value, kind}) => {
+const SortableItem = SortableElement(({height, value, kind, onEditShelfName}) => {
     return (
         <li style={{height}} className={kind}>
             {
                 kind === 'record'
                 ? (<Record info={value}/>)
-                : (<ShelfHeader info={value}/>)
+                : (
+                    <ShelfHeader
+                        info={value}
+                        onEdit={onEditShelfName}
+                    />
+                )
 
             }
         </li>
     )
 });
 
-const SortableList = SortableContainer(({items}) => {
+const SortableList = SortableContainer(({items, onEditShelfName}) => {
     return (
         <Infinite
             elementHeight={ELEMENT_HEIGHT}
@@ -81,6 +115,7 @@ const SortableList = SortableContainer(({items}) => {
                         kind={kind}
                         value={value}
                         height={height}
+                        onEditShelfName={_.partial(onEditShelfName, index)}
                     />
                 )}
         </Infinite>
@@ -115,20 +150,25 @@ class App extends Component {
     }
 
     onSortEnd = ({oldIndex, newIndex}) => {
-
         if (newIndex === 0) {
             // don't allow any records to be above the top shelf
             newIndex = 1;
         }
 
-        let {items} = this.state;
+        const {items} = this.state;
         this.setState({
             items: arrayMove(items, oldIndex, newIndex)
         });
     }
 
+    onEditShelfName = (index, new_title) => {
+        const _items = _.cloneDeep(this.state.items);
+        _items[index].value.title = new_title;
+        this.setState({items: _items});
+    }
+
     onNewShelf = () => {
-        let {items} = this.state;
+        const {items} = this.state;
 
         const newShelf = {
             kind: 'shelf',
@@ -159,6 +199,7 @@ class App extends Component {
                 <SortableList
                     items={items}
                     onSortEnd={this.onSortEnd}
+                    onEditShelfName={this.onEditShelfName}
                     useDragHandle={true}
                 />
             </div>
