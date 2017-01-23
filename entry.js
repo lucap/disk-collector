@@ -25,7 +25,7 @@ class ShelfHeader extends Component {
     };
 }
 
-class Release extends Component {
+class Record extends Component {
     render() {
         const {info} = this.props;
         return (
@@ -40,10 +40,10 @@ class Release extends Component {
 
 const SortableItem = SortableElement(({height, value, kind}) => {
     return (
-        <li style={{height}} className={kind === 'release' ? 'release' : 'shelf_header'}>
+        <li style={{height}} className={kind}>
             {
-                kind === 'release'
-                ? (<Release info={value}/>)
+                kind === 'record'
+                ? (<Record info={value}/>)
                 : (<ShelfHeader info={value}/>)
 
             }
@@ -73,11 +73,11 @@ const SortableList = SortableContainer(({items}) => {
 class App extends Component {
     constructor(props) {
         super(props);
-        const {releases} = this.props;
-        const items = _.map(releases, (release) => {
+        const {records} = this.props;
+        const items = _.map(records, (record) => {
             return {
-                kind: 'release',
-                value: release,
+                kind: 'record',
+                value: record,
                 height: ELEMENT_HEIGHT
             }
         })
@@ -86,7 +86,7 @@ class App extends Component {
             kind: 'shelf',
             value: {
                 editable: false,
-                title: 'Unshelved Releases',
+                title: 'Unshelved Records',
             },
             height: ELEMENT_HEIGHT
         };
@@ -99,7 +99,7 @@ class App extends Component {
     onSortEnd = ({oldIndex, newIndex}) => {
 
         if (newIndex === 0) {
-            // don't allow any release to be above the top shelf
+            // don't allow any records to be above the top shelf
             newIndex = 1;
         }
 
@@ -149,7 +149,7 @@ class App extends Component {
 }
 
 const initializeApp = () => {
-    let releases = [];
+    let records = [];
     fetch('/test_data/page_1.json')
         .then((response) => {
             if (response.status !== 200) {
@@ -158,9 +158,9 @@ const initializeApp = () => {
             }
 
             response.json().then((data) => {
-                releases = _.concat(releases, data.releases);
+                records = _.concat(records, data.releases);
                 render(
-                    <App releases={releases}/>,
+                    <App records={records}/>,
                     document.getElementById('root')
                 );
             })
