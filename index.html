@@ -27,13 +27,17 @@
                 border-radius: 3px;
                 margin-bottom: -1px;
                 max-width: 100%;
-                line-height: 3;
                 vertical-align: middle;
             }
 
             li.record {
                 background: white;
                 border: 1px solid black;
+            }
+
+            .record_info > div {
+                padding: 5px 0 5px 0;
+                text-overflow: ellipsis;
             }
 
             li.shelf {
@@ -47,6 +51,9 @@
 
             .handle {
                 float: right;
+                position: absolute;
+                right: 10px;
+                top: 35px;
                 font-size: 30px;
                 cursor: move;
                 cursor: grab;

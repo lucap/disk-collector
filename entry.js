@@ -13,6 +13,11 @@ const insert = (arr, item, index) => {
     return _arr;
 }
 
+const joinNames = (info) => {
+    return _.join(_.map(info, (item) => {
+        return item.name;
+    }), ', ')
+}
 
 const DragHandle = SortableHandle(() => <span className={'handle'}>&#8801;</span>);
 
@@ -27,10 +32,23 @@ class ShelfHeader extends Component {
 
 class Record extends Component {
     render() {
-        const {info} = this.props;
+        const {
+            info: {
+                basic_information: {title, artists, formats, labels, year}
+            }
+        } = this.props;
+
         return (
-            <div>
-                <span>{info.basic_information.title}</span>
+            <div className={'record_info'}>
+                <div>{title}</div>
+                <div>{joinNames(artists)}</div>
+                <div>
+                    {joinNames(labels)}
+                    &nbsp;&mdash;&nbsp;
+                    {joinNames(formats)}
+                    &nbsp;&mdash;&nbsp;
+                    {year}
+                </div>
                 <DragHandle/>
             </div>
         );
